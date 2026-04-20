@@ -1,0 +1,25 @@
+# Maven / Spring Boot
+backend/target/
+*.jar
+*.war
+*.ear
+*.class
+
+# Frontend / Node
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Local binaries that shouldn't be tracked
+maven/
+maven.zip
+
+# IDE / Editor configuration
+.idea/
+*.iml
+.vscode/
+
+# Operating System files
+.DS_Store
+Thumbs.db
