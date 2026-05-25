@@ -16,6 +16,11 @@ const StudentDashboard = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Search & Filter State
+  const [searchName, setSearchName] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+  const [searchDept, setSearchDept] = useState('');
+
   useEffect(() => {
     const storedEmail = localStorage.getItem('studentEmail');
     if (!storedEmail) {
@@ -34,6 +39,27 @@ const StudentDashboard = () => {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleSearch = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (searchName) params.append('name', searchName);
+      if (searchDate) params.append('date', searchDate);
+      if (searchDept) params.append('department', searchDept);
+      
+      const res = await api.get(`/student/events/search?${params.toString()}`);
+      setEvents(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchName('');
+    setSearchDate('');
+    setSearchDept('');
+    fetchEvents();
   };
 
   const fetchMyRegistrations = async (userEmail) => {
@@ -106,8 +132,45 @@ const StudentDashboard = () => {
         {successMsg && <div className="glass-panel mb-4" style={{ borderColor: 'green', color: 'green' }}>{successMsg}</div>}
 
         {activeTab === 'explore' && !registeringFor && (
-          <div className="grid grid-cols-3">
-            {events.map(event => (
+          <>
+            <div className="glass-panel mb-6 flex gap-4 items-end" style={{ padding: '1rem', flexWrap: 'wrap' }}>
+              <div className="form-group mb-0" style={{ flex: '1 1 200px' }}>
+                <label>Search by Name</label>
+                <input 
+                  type="text" 
+                  placeholder="Event name..." 
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  style={{ marginBottom: 0 }}
+                />
+              </div>
+              <div className="form-group mb-0" style={{ flex: '1 1 150px' }}>
+                <label>Date</label>
+                <input 
+                  type="date" 
+                  value={searchDate}
+                  onChange={(e) => setSearchDate(e.target.value)}
+                  style={{ marginBottom: 0 }}
+                />
+              </div>
+              <div className="form-group mb-0" style={{ flex: '1 1 200px' }}>
+                <label>Department</label>
+                <input 
+                  type="text" 
+                  placeholder="Department..." 
+                  value={searchDept}
+                  onChange={(e) => setSearchDept(e.target.value)}
+                  style={{ marginBottom: 0 }}
+                />
+              </div>
+              <div className="flex gap-2" style={{ flex: '0 0 auto' }}>
+                <button className="btn btn-primary" onClick={handleSearch} style={{ height: '42px' }}>Search</button>
+                <button className="btn btn-outline" onClick={clearFilters} style={{ height: '42px' }}>Clear</button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3">
+              {events.map(event => (
               <div key={event.id} className="glass-panel event-card">
                 <div>
                   <div className="flex justify-between items-center mb-2">
@@ -134,6 +197,7 @@ const StudentDashboard = () => {
             ))}
             {events.length === 0 && <p>No events available right now.</p>}
           </div>
+          </>
         )}
 
         {activeTab === 'explore' && registeringFor && (

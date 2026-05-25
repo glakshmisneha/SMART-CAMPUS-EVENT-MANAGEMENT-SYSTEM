@@ -57,6 +57,23 @@ public class StudentController {
         return eventRepository.findAll();
     }
 
+    @GetMapping("/events/search")
+    public List<Event> searchEvents(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String department) {
+        
+        java.time.LocalDate searchDate = null;
+        if (date != null && !date.trim().isEmpty()) {
+            searchDate = java.time.LocalDate.parse(date);
+        }
+        
+        String searchName = (name != null && !name.trim().isEmpty()) ? name.trim() : null;
+        String searchDept = (department != null && !department.trim().isEmpty()) ? department.trim() : null;
+
+        return eventRepository.searchEvents(searchName, searchDate, searchDept);
+    }
+
     @PostMapping("/events/{eventId}/register")
     public ResponseEntity<?> registerForEvent(@PathVariable Long eventId, @Valid @RequestBody Registration registration) {
         Optional<Event> eventOpt = eventRepository.findById(eventId);
